@@ -70,12 +70,20 @@ def load_audio(file, sample_rate):
     return audio.flatten()
 
 
+logger = logging.getLogger(__name__)
+
+
 def load_audio_infer(
     file,
     sample_rate,
     **kwargs,
 ):
     formant_shifting = kwargs.get("formant_shifting", False)
+    logger.info(
+        "load_audio_infer: file=%s, formant_shifting=%s",
+        file,
+        formant_shifting,
+    )
     try:
         file = file.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
         if not pathlib.Path(file).is_file():
@@ -93,6 +101,14 @@ def load_audio_infer(
         if formant_shifting:
             formant_qfrency = kwargs.get("formant_qfrency", 0.8)
             formant_timbre = kwargs.get("formant_timbre", 0.8)
+            logger.info(
+                "Applying formant shift: qfrency=%s (quefrency=%s),"
+                " timbre=%s, sample_rate=%s",
+                formant_qfrency,
+                formant_qfrency * 1e-3,
+                formant_timbre,
+                sample_rate,
+            )
 
             from stftpitchshift import StftPitchShift
 
@@ -103,6 +119,7 @@ def load_audio_infer(
                 quefrency=formant_qfrency * 1e-3,
                 distortion=formant_timbre,
             )
+            logger.info("Formant shift applied successfully")
     except Exception as error:
         raise RuntimeError(f"An error occurred loading the audio: {error}")
     return np.array(audio).flatten()

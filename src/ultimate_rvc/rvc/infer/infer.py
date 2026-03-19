@@ -101,7 +101,6 @@ class VoiceConverter:
 
         """
         try:
-
             reduced_noise = nr.reduce_noise(
                 y=data,
                 sr=sr,
@@ -272,6 +271,10 @@ class VoiceConverter:
         self.get_vc(model_path, sid)
         start_time = time.time()
         logger.info("Converting audio '%s'...", audio_input_path)
+        logger.info(
+            "convert_audio kwargs: %s",
+            {k: v for k, v in kwargs.items() if "formant" in k},
+        )
 
         audio = load_audio_infer(
             audio_input_path,
@@ -288,7 +291,8 @@ class VoiceConverter:
             self.last_embedder_model = embedder_model
 
         file_index = (
-            index_path.strip()
+            index_path
+            .strip()
             .strip('"')
             .strip("\n")
             .strip('"')
@@ -394,10 +398,9 @@ class VoiceConverter:
         """
         pid = os.getpid()
         try:
-            with pathlib.Path(os.path.join(now_dir, "assets", "infer_pid.txt")).open(
-                "w",
-            ) as pid_file:
-                pid_file.write(str(pid))
+            pathlib.Path(os.path.join(now_dir, "assets", "infer_pid.txt")).write_text(
+                str(pid)
+            )
             start_time = time.time()
             print(f"Converting audio batch '{audio_input_paths}'...")
             audio_files = [

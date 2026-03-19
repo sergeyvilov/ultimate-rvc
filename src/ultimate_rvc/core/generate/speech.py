@@ -51,7 +51,6 @@ from ultimate_rvc.typing_extra import (
 )
 
 if TYPE_CHECKING:
-
     import aiohttp
 
     import gradio as gr
@@ -230,8 +229,7 @@ def run_edge_tts(
     source_path = Path(source)
     source_is_file = source_path.is_file()
     if source_is_file:
-        with source_path.open("r", encoding="utf-8") as file:
-            text = file.read()
+        text = source_path.read_text(encoding="utf-8")
     else:
         text = source
 
@@ -481,6 +479,9 @@ def run_pipeline(
     autotune_strength: float = 1,
     proposed_pitch: bool = False,
     proposed_pitch_threshold: float = 155.0,
+    formant_shifting: bool = False,
+    formant_qfrency: float = 0.8,
+    formant_timbre: float = 0.8,
     clean_speech: bool = False,
     clean_strength: float = 0.7,
     embedder_model: EmbedderModel = EmbedderModel.CONTENTVEC,
@@ -563,6 +564,16 @@ def run_pipeline(
     proposed_pitch_threshold: float = 155.0,
         The threshold for proposed pitch correction.
 
+    formant_shifting : bool, default=False
+        Whether to apply formant shifting to the input audio before
+        RVC conversion.
+
+    formant_qfrency : float, default=0.8
+        The quefrency used for formant shifting.
+
+    formant_timbre : float, default=0.8
+        The timbre distortion used for formant shifting.
+
     clean_speech : bool, default=False
         Whether to clean the speech converted using RVC.
 
@@ -614,6 +625,13 @@ def run_pipeline(
         tts_volume_change,
     )
     display_progress("[~] Converting speech using RVC...", 0.33, progress_bar)
+    logger.info(
+        "speech.run_pipeline: formant_shifting=%s,"
+        " formant_qfrency=%s, formant_timbre=%s",
+        formant_shifting,
+        formant_qfrency,
+        formant_timbre,
+    )
     converted_speech_track = convert(
         audio_track=speech_track,
         directory=SPEECH_DIR,
@@ -629,6 +647,9 @@ def run_pipeline(
         autotune_strength=autotune_strength,
         proposed_pitch=proposed_pitch,
         proposed_pitch_threshold=proposed_pitch_threshold,
+        formant_shifting=formant_shifting,
+        formant_qfrency=formant_qfrency,
+        formant_timbre=formant_timbre,
         clean_audio=clean_speech,
         clean_strength=clean_strength,
         embedder_model=embedder_model,

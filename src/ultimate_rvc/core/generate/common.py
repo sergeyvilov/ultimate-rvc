@@ -182,7 +182,8 @@ def wavify(
         wav_path, wav_json_path = paths
         if not all(path.exists() for path in paths):
             _, stderr = (
-                ffmpeg.input(audio_path)
+                ffmpeg
+                .input(audio_path)
                 .output(filename=wav_path, f="wav")
                 .run(
                     overwrite_output=True,
@@ -269,6 +270,9 @@ def convert(
     autotune_strength: float = 1.0,
     proposed_pitch: bool = False,
     proposed_pitch_threshold: float = 155.0,
+    formant_shifting: bool = False,
+    formant_qfrency: float = 0.8,
+    formant_timbre: float = 0.8,
     clean_audio: bool = False,
     clean_strength: float = 0.7,
     embedder_model: EmbedderModel = EmbedderModel.CONTENTVEC,
@@ -314,6 +318,13 @@ def convert(
         matches the range of the voice model used.
     proposed_pitch_threshold : float, default=155.0
         The threshold for proposed pitch correction.
+    formant_shifting : bool, default=False
+        Whether to apply formant shifting to the input audio before
+        conversion.
+    formant_qfrency : float, default=0.8
+        The quefrency used for formant shifting.
+    formant_timbre : float, default=0.8
+        The timbre distortion used for formant shifting.
     clean_audio : bool, default=False
         Whether to clean the converted audio.
     clean_strength : float, default=0.7
@@ -363,6 +374,13 @@ def convert(
             Entity.CUSTOM_EMBEDDER_MODEL,
         )
 
+    logger.info(
+        "convert() called: formant_shifting=%s, formant_qfrency=%s, formant_timbre=%s",
+        formant_shifting,
+        formant_qfrency,
+        formant_timbre,
+    )
+
     audio_path = wavify(
         audio_path,
         directory_path,
@@ -388,6 +406,9 @@ def convert(
         autotune_strength=autotune_strength,
         proposed_pitch=proposed_pitch,
         proposed_pitch_threshold=proposed_pitch_threshold,
+        formant_shifting=formant_shifting,
+        formant_qfrency=formant_qfrency,
+        formant_timbre=formant_timbre,
         clean_audio=clean_audio,
         clean_strength=clean_strength,
         embedder_model=embedder_model,
@@ -411,6 +432,14 @@ def convert(
 
         voice_converter = _get_voice_converter()
 
+        logger.info(
+            "Calling voice_converter.convert_audio() with"
+            " formant_shifting=%s, formant_qfrency=%s,"
+            " formant_timbre=%s",
+            formant_shifting,
+            formant_qfrency,
+            formant_timbre,
+        )
         voice_converter.convert_audio(
             audio_input_path=str(audio_path),
             audio_output_path=str(converted_audio_path),
@@ -437,6 +466,9 @@ def convert(
             sid=sid,
             proposed_pitch=proposed_pitch,
             proposed_pitch_threshold=proposed_pitch_threshold,
+            formant_shifting=formant_shifting,
+            formant_qfrency=formant_qfrency,
+            formant_timbre=formant_timbre,
         )
         json_dump(args_dict, converted_audio_json_path)
     return converted_audio_path

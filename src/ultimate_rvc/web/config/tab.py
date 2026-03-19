@@ -86,6 +86,14 @@ class GenerationConfig(BaseTabConfig):
     proposed_pitch_threshold: SliderConfig
         Configuration settings for a proposed pitch threshold slider
         component.
+    formant_shifting : CheckboxConfig
+        Configuration settings for a formant shifting checkbox
+        component.
+    formant_qfrency : SliderConfig
+        Configuration settings for a formant quefrency slider
+        component.
+    formant_timbre : SliderConfig
+        Configuration settings for a formant timbre slider component.
     sid : NumberConfig
         Configuration settings for a speaker ID number component.
     output_sr : DropdownConfig
@@ -195,6 +203,37 @@ class GenerationConfig(BaseTabConfig):
         value=155.0,
         minimum=50.0,
         maximum=1200.0,
+        visible=False,
+    )
+    formant_shifting: CheckboxConfig = CheckboxConfig(
+        label="Formant shifting",
+        info=(
+            "Whether to apply formant shifting to the input audio"
+            " before conversion. Useful when source and target"
+            " voices differ significantly in vocal range."
+        ),
+        value=False,
+        exclude_value=True,
+    )
+    formant_qfrency: SliderConfig = SliderConfig(
+        label="Formant quefrency",
+        info=(
+            "Controls which formants are shifted. Higher values affect higher formants."
+        ),
+        value=0.8,
+        minimum=0.0,
+        maximum=2.0,
+        visible=False,
+    )
+    formant_timbre: SliderConfig = SliderConfig(
+        label="Formant timbre",
+        info=(
+            "Controls the intensity of formant shifting. Higher"
+            " values produce stronger timbre modification."
+        ),
+        value=0.8,
+        minimum=0.0,
+        maximum=2.0,
         visible=False,
     )
     sid: NumberConfig = NumberConfig(

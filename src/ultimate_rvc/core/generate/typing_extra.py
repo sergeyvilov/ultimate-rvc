@@ -140,6 +140,13 @@ class RVCAudioMetaData(BaseModel):
         matches the range of the voice model used.
     proposed_pitch_threshold : float
         The threshold for proposed pitch correction.
+    formant_shifting : bool
+        Whether formant shifting was applied to the input audio
+        before conversion.
+    formant_qfrency : float
+        The quefrency used for formant shifting.
+    formant_timbre : float
+        The timbre distortion used for formant shifting.
     clean_audio : bool
         Whether the converted audio was cleaned.
     clean_strength : float
@@ -167,6 +174,9 @@ class RVCAudioMetaData(BaseModel):
     autotune_strength: float
     proposed_pitch: bool
     proposed_pitch_threshold: float
+    formant_shifting: bool
+    formant_qfrency: float
+    formant_timbre: float
     clean_audio: bool
     clean_strength: float
     embedder_model: EmbedderModel

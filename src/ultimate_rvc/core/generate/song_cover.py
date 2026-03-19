@@ -919,6 +919,9 @@ def run_pipeline(
     autotune_strength: float = 1.0,
     proposed_pitch: bool = False,
     proposed_pitch_threshold: float = 155.0,
+    formant_shifting: bool = False,
+    formant_qfrency: float = 0.8,
+    formant_timbre: float = 0.8,
     clean_vocals: bool = False,
     clean_strength: float = 0.7,
     embedder_model: EmbedderModel = EmbedderModel.CONTENTVEC,
@@ -975,6 +978,13 @@ def run_pipeline(
         matches the range of the voice model used.
     proposed_pitch_threshold: float = 155.0,
         The threshold for proposed pitch correction.
+    formant_shifting : bool, default=False
+        Whether to apply formant shifting to the input audio before
+        vocal conversion.
+    formant_qfrency : float, default=0.8
+        The quefrency used for formant shifting.
+    formant_timbre : float, default=0.8
+        The timbre distortion used for formant shifting.
     clean_vocals : bool, default=False
         Whether to clean the converted vocals.
     clean_strength : float, default=0.7
@@ -1056,6 +1066,13 @@ def run_pipeline(
         SegmentSize.SEG_256,
     )
     display_progress("[~] Converting vocals...", 4 / 9, progress_bar)
+    logger.info(
+        "song_cover.run_pipeline: formant_shifting=%s,"
+        " formant_qfrency=%s, formant_timbre=%s",
+        formant_shifting,
+        formant_qfrency,
+        formant_timbre,
+    )
     converted_vocals_track = convert(
         audio_track=vocals_dereverb_track,
         directory=song_dir,
@@ -1071,6 +1088,9 @@ def run_pipeline(
         autotune_strength=autotune_strength,
         proposed_pitch=proposed_pitch,
         proposed_pitch_threshold=proposed_pitch_threshold,
+        formant_shifting=formant_shifting,
+        formant_qfrency=formant_qfrency,
+        formant_timbre=formant_timbre,
         clean_audio=clean_vocals,
         clean_strength=clean_strength,
         embedder_model=embedder_model,

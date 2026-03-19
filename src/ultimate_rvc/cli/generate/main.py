@@ -264,6 +264,41 @@ def convert_voice(
             ),
         ),
     ] = 155.0,
+    formant_shifting: Annotated[
+        bool,
+        typer.Option(
+            rich_help_panel=PanelName.VOICE_ENRICHMENT_OPTIONS,
+            help=(
+                "Whether to apply formant shifting to the input audio before"
+                " conversion. Useful when source and target voices differ"
+                " significantly in vocal range."
+            ),
+        ),
+    ] = False,
+    formant_qfrency: Annotated[
+        float,
+        typer.Option(
+            min=0.0,
+            max=2.0,
+            rich_help_panel=PanelName.VOICE_ENRICHMENT_OPTIONS,
+            help=(
+                "Controls which formants are shifted. Higher values affect higher"
+                " formants."
+            ),
+        ),
+    ] = 0.8,
+    formant_timbre: Annotated[
+        float,
+        typer.Option(
+            min=0.0,
+            max=2.0,
+            rich_help_panel=PanelName.VOICE_ENRICHMENT_OPTIONS,
+            help=(
+                "Controls the intensity of formant shifting. Higher values produce"
+                " stronger timbre modification."
+            ),
+        ),
+    ] = 0.8,
     clean_voice: Annotated[
         bool,
         typer.Option(
@@ -333,6 +368,9 @@ def convert_voice(
         autotune_strength=autotune_strength,
         proposed_pitch=proposed_pitch,
         proposed_pitch_threshold=proposed_pitch_threshold,
+        formant_shifting=formant_shifting,
+        formant_qfrency=formant_qfrency,
+        formant_timbre=formant_timbre,
         clean_audio=clean_voice,
         clean_strength=clean_strength,
         embedder_model=embedder_model,

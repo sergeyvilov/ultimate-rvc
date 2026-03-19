@@ -22,6 +22,7 @@ from ultimate_rvc.web.common import (
     PROGRESS_BAR,
     exception_harness,
     toggle_intermediate_audio,
+    toggle_visibilities,
     toggle_visibility,
     toggle_visible_component,
     update_dropdowns,
@@ -90,6 +91,9 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.autotune_strength.instance,
                 tab_config.proposed_pitch.instance,
                 tab_config.proposed_pitch_threshold.instance,
+                tab_config.formant_shifting.instance,
+                tab_config.formant_qfrency.instance,
+                tab_config.formant_timbre.instance,
                 tab_config.clean_voice.instance,
                 tab_config.clean_strength.instance,
                 tab_config.embedder_model.instance,
@@ -136,6 +140,9 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.autotune_strength.value,
                 tab_config.proposed_pitch.value,
                 tab_config.proposed_pitch_threshold.value,
+                tab_config.formant_shifting.value,
+                tab_config.formant_qfrency.value,
+                tab_config.formant_timbre.value,
                 tab_config.clean_voice.value,
                 tab_config.clean_strength.value,
                 tab_config.embedder_model.value,
@@ -163,6 +170,9 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.autotune_strength.instance,
                 tab_config.proposed_pitch.instance,
                 tab_config.proposed_pitch_threshold.instance,
+                tab_config.formant_shifting.instance,
+                tab_config.formant_qfrency.instance,
+                tab_config.formant_timbre.instance,
                 tab_config.clean_voice.instance,
                 tab_config.clean_strength.instance,
                 tab_config.embedder_model.instance,
@@ -252,6 +262,10 @@ def _render_conversion_options(tab_config: OneClickSongGenerationConfig) -> None
                 with gr.Column():
                     tab_config.clean_voice.instantiate()
                     tab_config.clean_strength.instantiate()
+                with gr.Column():
+                    tab_config.formant_shifting.instantiate()
+                    tab_config.formant_qfrency.instantiate()
+                    tab_config.formant_timbre.instantiate()
             tab_config.autotune_voice.instance.change(
                 partial(toggle_visibility, targets={True}),
                 inputs=tab_config.autotune_voice.instance,
@@ -268,6 +282,15 @@ def _render_conversion_options(tab_config: OneClickSongGenerationConfig) -> None
                 partial(toggle_visibility, targets={True}),
                 inputs=tab_config.clean_voice.instance,
                 outputs=tab_config.clean_strength.instance,
+                show_progress="hidden",
+            )
+            tab_config.formant_shifting.instance.change(
+                partial(toggle_visibilities, 2, targets={True}),
+                inputs=tab_config.formant_shifting.instance,
+                outputs=[
+                    tab_config.formant_qfrency.instance,
+                    tab_config.formant_timbre.instance,
+                ],
                 show_progress="hidden",
             )
         with gr.Accordion("Speaker embedding", open=False):
