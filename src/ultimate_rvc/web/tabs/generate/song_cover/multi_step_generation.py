@@ -12,6 +12,7 @@ from functools import partial
 import gradio as gr
 
 from ultimate_rvc.core.generate.common import convert
+from ultimate_rvc.core.generate.formant_shift import formant_shift
 from ultimate_rvc.core.generate.song_cover import (
     get_named_song_dirs,
     get_song_cover_name,
@@ -261,6 +262,22 @@ def _render_step_2(tab_config: MultiStepSongGenerationConfig) -> None:
             with gr.Row():
                 tab_config.n_octaves.instantiate()
                 tab_config.n_semitones.instantiate()
+            with gr.Accordion("Formant shifting", open=False):
+                with gr.Row():
+                    tab_config.formant_shift_ratio.instantiate()
+                    tab_config.pitch_range_factor.instantiate()
+                preview_formant_btn = gr.Button(
+                    "Preview formant shift",
+                    variant="secondary",
+                )
+                formant_preview_output = gr.Audio(
+                    label="Formant-shifted audio preview",
+                    type="filepath",
+                    interactive=False,
+                    waveform_options=gr.WaveformOptions(
+                        show_recording_waveform=False,
+                    ),
+                )
 
             converted_vocals_transfer = _render_song_transfer(
                 [SongTransferOption.STEP_3_VOCALS],
@@ -297,10 +314,25 @@ def _render_step_2(tab_config: MultiStepSongGenerationConfig) -> None:
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
 
+        preview_formant_btn.click(
+            exception_harness(
+                formant_shift,
+                info_msg="Formant shift applied!",
+            ),
+            inputs=[
+                tab_config.input_audio.vocals.instance,
+                tab_config.song_dirs.convert_vocals.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
+            ],
+            outputs=formant_preview_output,
+        )
         convert_vocals_reset_btn.click(
             lambda: [
                 tab_config.n_octaves.value,
                 tab_config.n_semitones.value,
+                tab_config.formant_shift_ratio.value,
+                tab_config.pitch_range_factor.value,
                 tab_config.f0_method.value,
                 tab_config.index_rate.value,
                 tab_config.rms_mix_rate.value,
@@ -319,6 +351,8 @@ def _render_step_2(tab_config: MultiStepSongGenerationConfig) -> None:
             outputs=[
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,
@@ -347,6 +381,8 @@ def _render_step_2(tab_config: MultiStepSongGenerationConfig) -> None:
                 tab_config.voice_model.instance,
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,

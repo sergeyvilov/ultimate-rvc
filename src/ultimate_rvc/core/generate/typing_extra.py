@@ -105,6 +105,26 @@ class SeparatedAudioMetaData(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
 
+class FormantShiftMetaData(BaseModel):
+    """
+    Metadata for a formant-shifted audio track.
+
+    Attributes
+    ----------
+    audio_track : FileMetaData
+        Metadata for the audio track that was formant-shifted.
+    formant_shift_ratio : float
+        The ratio used for shifting vocal formants.
+    pitch_range_factor : float
+        The factor used for scaling the pitch variation range.
+
+    """
+
+    audio_track: FileMetaData
+    formant_shift_ratio: float
+    pitch_range_factor: float
+
+
 class RVCAudioMetaData(BaseModel):
     """
     Metadata for a voice converted audio track.
@@ -118,6 +138,10 @@ class RVCAudioMetaData(BaseModel):
     n_semitones : int
         The number of semitones the converted audio was pitch-shifted
         by.
+    formant_shift_ratio : float
+        The ratio used for shifting vocal formants.
+    pitch_range_factor : float
+        The factor used for scaling the pitch variation range.
     f0_method : F0Method
         The method used for pitch extraction.
     index_rate : float
@@ -158,6 +182,8 @@ class RVCAudioMetaData(BaseModel):
     audio_track: FileMetaData
     model_name: str
     n_semitones: int
+    formant_shift_ratio: float
+    pitch_range_factor: float
     f0_method: F0Method
     index_rate: float
     rms_mix_rate: float

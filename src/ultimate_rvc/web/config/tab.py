@@ -197,6 +197,29 @@ class GenerationConfig(BaseTabConfig):
         maximum=1200.0,
         visible=False,
     )
+    formant_shift_ratio: SliderConfig = SliderConfig(
+        label="Formant shift ratio",
+        info=(
+            "Ratio for shifting vocal formants. Values greater than 1.0 raise"
+            " formants, values less than 1.0 lower them. 1.0 means no"
+            " change."
+        ),
+        value=1.0,
+        minimum=0.5,
+        maximum=2.0,
+        step=0.01,
+    )
+    pitch_range_factor: SliderConfig = SliderConfig(
+        label="Pitch range factor",
+        info=(
+            "Factor for scaling the pitch variation range."
+            " 1.0 means no change."
+        ),
+        value=1.0,
+        minimum=0.5,
+        maximum=2.0,
+        step=0.01,
+    )
     sid: NumberConfig = NumberConfig(
         label="Speaker ID",
         info="Speaker ID for multi-speaker-models.",

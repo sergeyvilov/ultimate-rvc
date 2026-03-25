@@ -78,6 +78,8 @@ def render(total_config: TotalConfig) -> None:
                 tab_config.tts_volume_change.instance,
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,
@@ -116,6 +118,8 @@ def render(total_config: TotalConfig) -> None:
                 tab_config.tts_volume_change.value,
                 tab_config.n_octaves.value,
                 tab_config.n_semitones.value,
+                tab_config.formant_shift_ratio.value,
+                tab_config.pitch_range_factor.value,
                 tab_config.f0_method.value,
                 tab_config.index_rate.value,
                 tab_config.rms_mix_rate.value,
@@ -140,6 +144,8 @@ def render(total_config: TotalConfig) -> None:
                 tab_config.tts_volume_change.instance,
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,
@@ -204,6 +210,9 @@ def _render_conversion_options(tab_config: OneClickSpeechGenerationConfig) -> No
         with gr.Row():
             tab_config.n_octaves.instantiate()
             tab_config.n_semitones.instantiate()
+        with gr.Accordion("Formant shifting", open=False), gr.Row():
+            tab_config.formant_shift_ratio.instantiate()
+            tab_config.pitch_range_factor.instantiate()
         with gr.Accordion("Voice synthesis", open=False):
             with gr.Row():
                 tab_config.f0_method.instantiate()

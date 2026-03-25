@@ -13,6 +13,7 @@ import gradio as gr
 
 from ultimate_rvc.core.common import SPEECH_DIR
 from ultimate_rvc.core.generate.common import convert
+from ultimate_rvc.core.generate.formant_shift import formant_shift
 from ultimate_rvc.core.generate.speech import (
     get_mixed_speech_track_name,
     mix_speech,
@@ -145,7 +146,7 @@ def _render_step_1(total_config: TotalConfig) -> None:
         )
 
 
-def _render_step_2(total_config: TotalConfig) -> None:
+def _render_step_2(total_config: TotalConfig) -> None:  # noqa: PLR0915
     tab_config = total_config.speech.multi_step
 
     with gr.Accordion("Step 2: speech conversion", open=False):
@@ -155,6 +156,22 @@ def _render_step_2(total_config: TotalConfig) -> None:
             with gr.Row():
                 tab_config.n_octaves.instantiate()
                 tab_config.n_semitones.instantiate()
+            with gr.Accordion("Formant shifting", open=False):
+                with gr.Row():
+                    tab_config.formant_shift_ratio.instantiate()
+                    tab_config.pitch_range_factor.instantiate()
+                preview_formant_btn = gr.Button(
+                    "Preview formant shift",
+                    variant="secondary",
+                )
+                formant_preview_output = gr.Audio(
+                    label="Formant-shifted audio preview",
+                    type="filepath",
+                    interactive=False,
+                    waveform_options=gr.WaveformOptions(
+                        show_recording_waveform=False,
+                    ),
+                )
             with gr.Accordion("Voice synthesis settings", open=False):
                 with gr.Row():
                     tab_config.f0_method.instantiate()
@@ -219,10 +236,27 @@ def _render_step_2(total_config: TotalConfig) -> None:
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        preview_formant_btn.click(
+            partial(
+                exception_harness(
+                    formant_shift,
+                    info_msg="Formant shift applied!",
+                ),
+                directory=SPEECH_DIR,
+            ),
+            inputs=[
+                tab_config.input_audio.speech.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
+            ],
+            outputs=formant_preview_output,
+        )
         convert_speech_reset_btn.click(
             lambda: [
                 tab_config.n_octaves.value,
                 tab_config.n_semitones.value,
+                tab_config.formant_shift_ratio.value,
+                tab_config.pitch_range_factor.value,
                 tab_config.f0_method.value,
                 tab_config.index_rate.value,
                 tab_config.rms_mix_rate.value,
@@ -241,6 +275,8 @@ def _render_step_2(total_config: TotalConfig) -> None:
             outputs=[
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,
@@ -271,6 +307,8 @@ def _render_step_2(total_config: TotalConfig) -> None:
                 tab_config.voice_model.instance,
                 tab_config.n_octaves.instance,
                 tab_config.n_semitones.instance,
+                tab_config.formant_shift_ratio.instance,
+                tab_config.pitch_range_factor.instance,
                 tab_config.f0_method.instance,
                 tab_config.index_rate.instance,
                 tab_config.rms_mix_rate.instance,

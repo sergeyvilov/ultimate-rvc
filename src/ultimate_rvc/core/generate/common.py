@@ -31,6 +31,7 @@ from ultimate_rvc.core.exceptions import (
     NotProvidedError,
     UIMessage,
 )
+from ultimate_rvc.core.generate.formant_shift import formant_shift
 from ultimate_rvc.core.generate.typing_extra import (
     AudioExtInternal,
     FileMetaData,
@@ -260,6 +261,8 @@ def convert(
     model_name: str,
     n_octaves: int = 0,
     n_semitones: int = 0,
+    formant_shift_ratio: float = 1.0,
+    pitch_range_factor: float = 1.0,
     f0_method: F0Method = F0Method.RMVPE,
     index_rate: float = 0.3,
     rms_mix_rate: float = 1.0,
@@ -293,6 +296,11 @@ def convert(
         The number of octaves to pitch-shift the converted audio by.
     n_semitones : int, default=0
         The number of semitones to pitch-shift the converted audio by.
+    formant_shift_ratio : float, default=1.0
+        The ratio for shifting vocal formants. Values greater than
+        1.0 raise formants, values less than 1.0 lower them.
+    pitch_range_factor : float, default=1.0
+        The factor for scaling the pitch variation range.
     f0_method : F0Method, default=F0Method.RMVPE
         The method to use for pitch extraction.
     index_rate : float, default=0.3
@@ -370,6 +378,13 @@ def convert(
         accepted_formats={AudioExt.M4A, AudioExt.AAC},
     )
 
+    audio_path = formant_shift(
+        audio_path,
+        directory_path,
+        formant_shift_ratio,
+        pitch_range_factor,
+    )
+
     n_semitones = n_octaves * 12 + n_semitones
 
     args_dict = RVCAudioMetaData(
@@ -379,6 +394,8 @@ def convert(
         ),
         model_name=model_name,
         n_semitones=n_semitones,
+        formant_shift_ratio=formant_shift_ratio,
+        pitch_range_factor=pitch_range_factor,
         f0_method=f0_method,
         index_rate=index_rate,
         rms_mix_rate=rms_mix_rate,

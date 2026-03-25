@@ -910,6 +910,8 @@ def run_pipeline(
     model_name: str,
     n_octaves: int = 0,
     n_semitones: int = 0,
+    formant_shift_ratio: float = 1.0,
+    pitch_range_factor: float = 1.0,
     f0_method: F0Method = F0Method.RMVPE,
     index_rate: float = 0.3,
     rms_mix_rate: float = 1.0,
@@ -952,6 +954,11 @@ def run_pipeline(
     n_semitones : int, default=0
         The number of semi-tones to pitch-shift the converted vocals,
         instrumentals, and backup vocals by.
+    formant_shift_ratio : float, default=1.0
+        The ratio for shifting vocal formants before conversion.
+    pitch_range_factor : float, default=1.0
+        The factor for scaling the pitch variation range before
+        conversion.
     f0_method: F0Method, default=F0Method.RMVPE
         The method to use for pitch extraction during vocal
         conversion.
@@ -1062,6 +1069,8 @@ def run_pipeline(
         model_name=model_name,
         n_octaves=n_octaves,
         n_semitones=n_semitones,
+        formant_shift_ratio=formant_shift_ratio,
+        pitch_range_factor=pitch_range_factor,
         f0_method=f0_method,
         index_rate=index_rate,
         rms_mix_rate=rms_mix_rate,
