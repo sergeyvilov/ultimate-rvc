@@ -87,6 +87,7 @@ def _render_config_files_tab(
                     label="Configuration JSON",
                     language="json",
                     interactive=False,
+                    max_lines=30,
                 )
 
         export_btn.click(
