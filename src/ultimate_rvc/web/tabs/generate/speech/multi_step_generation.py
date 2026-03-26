@@ -381,7 +381,6 @@ def _render_step_3(total_config: TotalConfig) -> None:
             max_lines=30,
         )
 
-        components = [config.instance for config in total_config.all]
         mix_speech_reset_btn.click(
             lambda: [
                 tab_config.output_gain.value,
@@ -418,7 +417,6 @@ def _render_step_3(total_config: TotalConfig) -> None:
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
-                *components,
             ],
             outputs=[mixed_speech_track_output, config_output],
             show_progress="hidden",

@@ -73,7 +73,6 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             interactive=False,
             max_lines=30,
         )
-        components = [config.instance for config in total_config.all]
         song_dirs = total_config.song.multi_step.song_dirs.all
         generate_btn.click(
             partial(
@@ -139,7 +138,6 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
-                *components,
             ],
             outputs=[song_cover, config_output],
             show_progress="hidden",

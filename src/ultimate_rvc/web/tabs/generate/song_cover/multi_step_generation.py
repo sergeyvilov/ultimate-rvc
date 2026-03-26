@@ -665,7 +665,6 @@ def _render_step_5(
             interactive=False,
             max_lines=30,
         )
-        components = [config.instance for config in total_config.all]
         mix_reset_btn.click(
             lambda: [
                 tab_config.main_gain.value,
@@ -730,7 +729,6 @@ def _render_step_5(
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
-                *components,
             ],
             outputs=[song_cover_output, config_output],
             show_progress="hidden",

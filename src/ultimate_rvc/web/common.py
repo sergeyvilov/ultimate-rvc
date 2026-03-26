@@ -784,11 +784,11 @@ def save_audio_with_config(
     output_name: str | None,
     song_voice_model: str | None,
     speech_voice_model: str | None,
-    *values: *tuple[Any, ...],
 ) -> tuple[str | None, str]:
     """
     Save a config JSON alongside an audio file, using the same
-    basename. Returns the JSON content for display.
+    basename. Includes all current UI settings and voice model
+    file metadata. Returns the JSON content for display.
 
     Parameters
     ----------
@@ -801,8 +801,6 @@ def save_audio_with_config(
         The name of the voice model selected for song generation.
     speech_voice_model : str | None
         The name of the voice model selected for speech generation.
-    *values : *tuple[Any, ...]
-        The component values to include in the configuration.
 
     Returns
     -------
@@ -823,11 +821,7 @@ def save_audio_with_config(
     audio_file = Path(audio_path)
     basename = output_name.strip() if output_name else audio_file.stem
 
-    new_config = TotalConfig()
-    for value, component_config in zip(values, new_config.all, strict=True):
-        component_config.value = value
-
-    config_dict = new_config.model_dump()
+    config_dict: dict[str, Any] = {}
 
     model_files = []
     for model_name in [song_voice_model, speech_voice_model]:
@@ -847,6 +841,7 @@ def save_audio_with_config(
                 model_files.append({"name": model_name, "error": "not found"})
 
     config_dict["model_files"] = model_files
+    config_dict["audio_file"] = audio_file.name
 
     json_path = audio_file.parent / f"{basename}.json"
     json_dump(config_dict, json_path)

@@ -68,7 +68,6 @@ def render(total_config: TotalConfig) -> None:
             interactive=False,
             max_lines=30,
         )
-        components = [config.instance for config in total_config.all]
         generate_btn.click(
             partial(
                 exception_harness(
@@ -125,7 +124,6 @@ def render(total_config: TotalConfig) -> None:
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
-                *components,
             ],
             outputs=[mixed_speech, config_output],
             show_progress="hidden",
