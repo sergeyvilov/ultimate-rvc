@@ -18,6 +18,7 @@ from ultimate_rvc.core.manage.audio import (
 )
 from ultimate_rvc.typing_extra import EmbedderModel
 from ultimate_rvc.web.common import (
+    DOWNLOAD_AUDIO_JS,
     PROGRESS_BAR,
     exception_harness,
     save_audio_with_config,
@@ -57,6 +58,7 @@ def render(total_config: TotalConfig) -> None:
         with gr.Row(equal_height=True):
             reset_btn = gr.Button(value="Reeset settings", scale=2)
             generate_btn = gr.Button(value="Generate", scale=2, variant="primary")
+            download_btn = gr.Button(value="Download audio", scale=2)
         mixed_speech = gr.Audio(
             label="Mixed speech",
             scale=3,
@@ -176,6 +178,12 @@ def render(total_config: TotalConfig) -> None:
                 tab_config.show_intermediate_audio.instance,
             ],
             show_progress="hidden",
+        )
+        download_btn.click(
+            fn=None,
+            inputs=[mixed_speech, tab_config.output_name.instance],
+            outputs=None,
+            js=DOWNLOAD_AUDIO_JS,
         )
 
 

@@ -37,6 +37,31 @@ if TYPE_CHECKING:
 
 PROGRESS_BAR = gr.Progress()
 
+DOWNLOAD_AUDIO_JS = """(audio_path, name) => {
+    const audio_el = document.querySelector(
+        'audio[src]:not([src=""])'
+    );
+    if (!audio_el || !audio_el.src) {
+        alert('No audio to download');
+        return;
+    }
+    const src = audio_el.src;
+    const ext = src.split('.').pop().split('?')[0] || 'wav';
+    const fname = (name || 'output').trim() + '.' + ext;
+    fetch(src)
+        .then(r => r.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fname;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+}"""
+
 T = TypeVar("T")
 P = ParamSpec("P")
 U = TypeVar("U", bound=SongTransferOption | SpeechTransferOption)

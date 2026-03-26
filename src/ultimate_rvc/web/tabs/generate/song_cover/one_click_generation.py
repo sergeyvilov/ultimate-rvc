@@ -19,6 +19,7 @@ from ultimate_rvc.core.generate.song_cover import (
 from ultimate_rvc.core.manage.audio import get_saved_output_audio
 from ultimate_rvc.typing_extra import EmbedderModel
 from ultimate_rvc.web.common import (
+    DOWNLOAD_AUDIO_JS,
     PROGRESS_BAR,
     exception_harness,
     save_audio_with_config,
@@ -62,6 +63,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         with gr.Row(equal_height=True):
             reset_btn = gr.Button(value="Reset options", scale=2)
             generate_btn = gr.Button("Generate", scale=2, variant="primary")
+            download_btn = gr.Button("Download audio", scale=2)
         song_cover = gr.Audio(
             label="Song cover",
             scale=3,
@@ -196,6 +198,12 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.show_intermediate_audio.instance,
             ],
             show_progress="hidden",
+        )
+        download_btn.click(
+            fn=None,
+            inputs=[song_cover, tab_config.output_name.instance],
+            outputs=None,
+            js=DOWNLOAD_AUDIO_JS,
         )
 
 

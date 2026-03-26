@@ -25,6 +25,7 @@ from ultimate_rvc.core.manage.audio import (
 )
 from ultimate_rvc.typing_extra import EmbedderModel, RVCContentType
 from ultimate_rvc.web.common import (
+    DOWNLOAD_AUDIO_JS,
     exception_harness,
     render_transfer_component,
     save_audio_with_config,
@@ -367,7 +368,9 @@ def _render_step_3(total_config: TotalConfig) -> None:
         with gr.Row():
             mix_speech_btn = gr.Button("Mix speech", variant="primary")
             mix_speech_transfer_btn = gr.Button("Transfer mixed speech")
-        mix_speech_reset_btn = gr.Button("Reset settings")
+        with gr.Row():
+            mix_speech_reset_btn = gr.Button("Reset settings")
+            download_btn = gr.Button("Download audio")
         mixed_speech_track_output = gr.Audio(
             label="Mixed speech",
             type="filepath",
@@ -420,6 +423,12 @@ def _render_step_3(total_config: TotalConfig) -> None:
             mixed_speech_transfer,
             mixed_speech_track_output,
             tab_config.input_audio.all,
+        )
+        download_btn.click(
+            fn=None,
+            inputs=[mixed_speech_track_output, tab_config.output_name.instance],
+            outputs=None,
+            js=DOWNLOAD_AUDIO_JS,
         )
 
 
