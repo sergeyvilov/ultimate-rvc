@@ -69,6 +69,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        audio_path_state = gr.Textbox(visible=False)
         config_json_state = gr.Textbox(visible=False)
         song_dirs = total_config.song.multi_step.song_dirs.all
         generate_btn.click(
@@ -127,16 +128,6 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         ).then(
             partial(update_dropdowns, get_saved_output_audio, 1, [], [0]),
             outputs=total_config.management.audio.output.instance,
-            show_progress="hidden",
-        ).then(
-            save_audio_with_config,
-            inputs=[
-                song_cover,
-                tab_config.output_name.instance,
-                total_config.song.multi_step.voice_model.instance,
-                total_config.speech.multi_step.voice_model.instance,
-            ],
-            outputs=[song_cover, config_json_state],
             show_progress="hidden",
         )
         reset_btn.click(
@@ -201,9 +192,18 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             show_progress="hidden",
         )
         download_btn.click(
-            fn=None,
+            save_audio_with_config,
             inputs=[
                 song_cover,
+                tab_config.output_name.instance,
+                total_config.song.multi_step.voice_model.instance,
+                total_config.speech.multi_step.voice_model.instance,
+            ],
+            outputs=[audio_path_state, config_json_state],
+        ).then(
+            fn=None,
+            inputs=[
+                audio_path_state,
                 tab_config.output_name.instance,
                 config_json_state,
             ],
