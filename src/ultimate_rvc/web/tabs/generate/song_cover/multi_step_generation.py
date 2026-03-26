@@ -655,7 +655,7 @@ def _render_step_5(
             mix_btn = gr.Button("Mix song cover", variant="primary")
         with gr.Row():
             song_cover_transfer_btn = gr.Button("Transfer song cover")
-            download_btn = gr.Button("Download audio")
+            download_btn = gr.Button("Download audio and config")
         song_cover_output = gr.Audio(
             label="Song cover",
             type="filepath",

@@ -63,7 +63,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         with gr.Row(equal_height=True):
             reset_btn = gr.Button(value="Reset options", scale=2)
             generate_btn = gr.Button("Generate", scale=2, variant="primary")
-            download_btn = gr.Button("Download audio", scale=2)
+            download_btn = gr.Button("Download audio and config", scale=2)
         song_cover = gr.Audio(
             label="Song cover",
             scale=3,

@@ -370,7 +370,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
             mix_speech_transfer_btn = gr.Button("Transfer mixed speech")
         with gr.Row():
             mix_speech_reset_btn = gr.Button("Reset settings")
-            download_btn = gr.Button("Download audio")
+            download_btn = gr.Button("Download audio and config")
         mixed_speech_track_output = gr.Audio(
             label="Mixed speech",
             type="filepath",
