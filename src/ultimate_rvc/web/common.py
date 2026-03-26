@@ -864,8 +864,11 @@ def save_audio_with_config(
     if not audio_path:
         return None, ""
 
-    if isinstance(audio_path, tuple):
+    if isinstance(audio_path, tuple | list):
         audio_path = audio_path[0]
+
+    if not isinstance(audio_path, str | Path):
+        return None, ""
 
     audio_file = Path(audio_path)
     basename = output_name.strip() if output_name else audio_file.stem
