@@ -72,10 +72,15 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         audio_path_state = gr.Textbox(visible=False)
         config_json_state = gr.Textbox(visible=False)
         song_dirs = total_config.song.multi_step.song_dirs.all
+
+        def _run_pipeline_with_path(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+            result = run_pipeline(*args, **kwargs)
+            return (result[0], str(result[0]), *result[1:])
+
         generate_btn.click(
             partial(
                 exception_harness(
-                    run_pipeline,
+                    _run_pipeline_with_path,
                     info_msg="Song cover generated successfully!",
                 ),
                 cookiefile=cookiefile,
@@ -113,7 +118,11 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 tab_config.output_format.instance,
                 tab_config.output_name.instance,
             ],
-            outputs=[song_cover, *tab_config.intermediate_audio.all],
+            outputs=[
+                song_cover,
+                audio_path_state,
+                *tab_config.intermediate_audio.all,
+            ],
             concurrency_limit=1,
             concurrency_id=ConcurrencyId.GPU,
         ).success(
@@ -194,7 +203,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         download_btn.click(
             save_audio_with_config,
             inputs=[
-                song_cover,
+                audio_path_state,
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,

@@ -395,8 +395,16 @@ def _render_step_3(total_config: TotalConfig) -> None:
             ],
             show_progress="hidden",
         )
+
+        def _mix_speech_with_path(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+            result = mix_speech(*args, **kwargs)
+            return result, str(result)
+
         mix_speech_btn.click(
-            exception_harness(mix_speech, info_msg="Speech successfully mixed!"),
+            exception_harness(
+                _mix_speech_with_path,
+                info_msg="Speech successfully mixed!",
+            ),
             inputs=[
                 tab_config.input_audio.converted_speech.instance,
                 tab_config.output_gain.instance,
@@ -404,7 +412,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
                 tab_config.output_format.instance,
                 tab_config.output_name.instance,
             ],
-            outputs=mixed_speech_track_output,
+            outputs=[mixed_speech_track_output, audio_path_state],
         ).then(
             partial(update_dropdowns, get_saved_output_audio, 1, [], [0]),
             outputs=total_config.management.audio.output.instance,
@@ -419,7 +427,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
         download_btn.click(
             save_audio_with_config,
             inputs=[
-                mixed_speech_track_output,
+                audio_path_state,
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,

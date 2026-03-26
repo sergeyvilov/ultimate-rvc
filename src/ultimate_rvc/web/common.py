@@ -38,49 +38,33 @@ if TYPE_CHECKING:
 PROGRESS_BAR = gr.Progress()
 
 DOWNLOAD_AUDIO_JS = """(audio_path, name, json_content) => {
-    let path = audio_path;
-    if (path && typeof path === 'object' && path.path) path = path.path;
-    if (path && typeof path === 'object' && path.url) path = path.url;
+    let path = audio_path || '';
     let base = (name || '').trim();
     let ext = 'wav';
-    if (path && typeof path === 'string') {
+    if (path) {
         const fname = path.split('/').pop().split('?')[0];
         ext = fname.split('.').pop() || 'wav';
         if (!base) base = fname.replace(/\\.[^.]+$/, '');
     }
     base = base || 'output';
-    function downloadBlob(blob, filename) {
+    if (path) {
+        const a = document.createElement('a');
+        a.href = '/gradio_api/file=' + path;
+        a.download = base + '.' + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+    if (json_content) {
+        const blob = new Blob([json_content], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = filename;
+        a.download = base + '.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-    }
-    if (path && typeof path === 'string') {
-        const api_url = '/gradio_api/file=' + path;
-        fetch(api_url)
-            .then(r => r.blob())
-            .then(blob => downloadBlob(blob, base + '.' + ext))
-            .catch(() => {
-                const audio_el = document.querySelector(
-                    'audio[src]:not([src=""])'
-                );
-                if (audio_el && audio_el.src) {
-                    const a = document.createElement('a');
-                    a.href = audio_el.src;
-                    a.download = base + '.' + ext;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }
-            });
-    }
-    if (json_content) {
-        const blob = new Blob([json_content], {type: 'application/json'});
-        downloadBlob(blob, base + '.json');
     }
 }"""
 

@@ -683,6 +683,11 @@ def _render_step_5(
             ],
             show_progress="hidden",
         )
+
+        def _mix_song_with_path(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+            result = mix_song(*args, **kwargs)
+            return result, str(result)
+
         temp_audio_gains = gr.State()
         mix_btn.click(
             partial(
@@ -708,7 +713,10 @@ def _render_step_5(
             },
             outputs=temp_audio_gains,
         ).then(
-            exception_harness(mix_song, info_msg="Song cover succesfully generated."),
+            exception_harness(
+                _mix_song_with_path,
+                info_msg="Song cover succesfully generated.",
+            ),
             inputs=[
                 temp_audio_gains,
                 tab_config.song_dirs.mix.instance,
@@ -716,7 +724,7 @@ def _render_step_5(
                 tab_config.output_format.instance,
                 tab_config.output_name.instance,
             ],
-            outputs=song_cover_output,
+            outputs=[song_cover_output, audio_path_state],
         ).then(
             partial(update_dropdowns, get_saved_output_audio, 1, [], [0]),
             outputs=total_config.management.audio.output.instance,
@@ -731,7 +739,7 @@ def _render_step_5(
         download_btn.click(
             save_audio_with_config,
             inputs=[
-                song_cover_output,
+                audio_path_state,
                 tab_config.output_name.instance,
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
