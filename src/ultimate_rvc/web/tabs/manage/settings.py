@@ -83,6 +83,11 @@ def _render_config_files_tab(
                     label="Download",
                     interactive=False,
                 )
+                export_code = gr.Code(
+                    label="Configuration JSON",
+                    language="json",
+                    interactive=False,
+                )
 
         export_btn.click(
             exception_harness(
@@ -95,7 +100,7 @@ def _render_config_files_tab(
                 total_config.speech.multi_step.voice_model.instance,
                 *components,
             ],
-            outputs=export_file,
+            outputs=[export_file, export_code],
         )
 
         with gr.Accordion("Load configuration", open=False), gr.Row():
