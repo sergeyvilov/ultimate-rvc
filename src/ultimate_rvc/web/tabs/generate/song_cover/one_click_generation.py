@@ -67,12 +67,6 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_output = gr.Code(
-            label="Configuration JSON",
-            language="json",
-            interactive=False,
-            max_lines=30,
-        )
         song_dirs = total_config.song.multi_step.song_dirs.all
         generate_btn.click(
             partial(
@@ -139,7 +133,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
             ],
-            outputs=[song_cover, config_output],
+            outputs=song_cover,
             show_progress="hidden",
         )
         reset_btn.click(

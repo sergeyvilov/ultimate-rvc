@@ -784,11 +784,10 @@ def save_audio_with_config(
     output_name: str | None,
     song_voice_model: str | None,
     speech_voice_model: str | None,
-) -> tuple[str | None, str]:
+) -> str | None:
     """
     Save a config JSON alongside an audio file, using the same
-    basename. Includes all current UI settings and voice model
-    file metadata. Returns the JSON content for display.
+    basename. The JSON is saved server-side only.
 
     Parameters
     ----------
@@ -804,19 +803,18 @@ def save_audio_with_config(
 
     Returns
     -------
-    tuple[str | None, str]
-        The audio path (unchanged) and the JSON content string.
+    str | None
+        The audio path (unchanged).
 
     """
     from ultimate_rvc.core.common import (  # noqa: PLC0415
         get_file_hash,
         json_dump,
-        json_dumps,
     )
     from ultimate_rvc.core.generate.common import _get_rvc_files  # noqa: PLC0415
 
     if not audio_path:
-        return None, ""
+        return None
 
     audio_file = Path(audio_path)
     basename = output_name.strip() if output_name else audio_file.stem
@@ -845,7 +843,7 @@ def save_audio_with_config(
 
     json_path = audio_file.parent / f"{basename}.json"
     json_dump(config_dict, json_path)
-    return audio_path, json_dumps(config_dict)
+    return audio_path
 
 
 def load_total_config_values(name: str) -> tuple[Any, ...]:

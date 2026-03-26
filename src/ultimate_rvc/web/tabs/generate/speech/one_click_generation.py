@@ -62,12 +62,6 @@ def render(total_config: TotalConfig) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_output = gr.Code(
-            label="Configuration JSON",
-            language="json",
-            interactive=False,
-            max_lines=30,
-        )
         generate_btn.click(
             partial(
                 exception_harness(
@@ -125,7 +119,7 @@ def render(total_config: TotalConfig) -> None:
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
             ],
-            outputs=[mixed_speech, config_output],
+            outputs=mixed_speech,
             show_progress="hidden",
         )
         reset_btn.click(

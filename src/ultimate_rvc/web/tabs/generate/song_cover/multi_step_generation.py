@@ -659,12 +659,6 @@ def _render_step_5(
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_output = gr.Code(
-            label="Configuration JSON",
-            language="json",
-            interactive=False,
-            max_lines=30,
-        )
         mix_reset_btn.click(
             lambda: [
                 tab_config.main_gain.value,
@@ -730,7 +724,7 @@ def _render_step_5(
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
             ],
-            outputs=[song_cover_output, config_output],
+            outputs=song_cover_output,
             show_progress="hidden",
         )
         setup_transfer_event(
