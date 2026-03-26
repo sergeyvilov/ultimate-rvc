@@ -377,7 +377,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_json_state = gr.State("")
+        config_json_state = gr.Textbox(visible=False)
 
         mix_speech_reset_btn.click(
             lambda: [

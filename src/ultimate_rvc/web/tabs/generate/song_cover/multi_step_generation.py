@@ -662,7 +662,7 @@ def _render_step_5(
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_json_state = gr.State("")
+        config_json_state = gr.Textbox(visible=False)
         mix_reset_btn.click(
             lambda: [
                 tab_config.main_gain.value,

@@ -69,7 +69,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_json_state = gr.State("")
+        config_json_state = gr.Textbox(visible=False)
         song_dirs = total_config.song.multi_step.song_dirs.all
         generate_btn.click(
             partial(

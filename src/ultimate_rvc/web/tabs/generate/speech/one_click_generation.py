@@ -64,7 +64,7 @@ def render(total_config: TotalConfig) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
-        config_json_state = gr.State("")
+        config_json_state = gr.Textbox(visible=False)
         generate_btn.click(
             partial(
                 exception_harness(
