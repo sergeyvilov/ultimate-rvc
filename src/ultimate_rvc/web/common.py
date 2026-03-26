@@ -39,28 +39,28 @@ PROGRESS_BAR = gr.Progress()
 
 DOWNLOAD_AUDIO_JS = """(audio_path, name, json_content) => {
     const base = (name || 'output').trim();
-    function downloadBlob(blob, filename) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
     const audio_el = document.querySelector(
         'audio[src]:not([src=""])'
     );
     if (audio_el && audio_el.src) {
         const ext = audio_el.src.split('.').pop().split('?')[0] || 'wav';
-        fetch(audio_el.src)
-            .then(r => r.blob())
-            .then(blob => downloadBlob(blob, base + '.' + ext));
+        const a = document.createElement('a');
+        a.href = audio_el.src;
+        a.download = base + '.' + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
     if (json_content) {
         const blob = new Blob([json_content], {type: 'application/json'});
-        downloadBlob(blob, base + '.json');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = base + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 }"""
 
