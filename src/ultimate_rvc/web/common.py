@@ -38,17 +38,21 @@ if TYPE_CHECKING:
 PROGRESS_BAR = gr.Progress()
 
 DOWNLOAD_AUDIO_JS = """(audio_path, name, json_content) => {
+    let path = audio_path;
+    if (path && typeof path === 'object' && path.path) path = path.path;
+    if (path && typeof path === 'object' && path.url) path = path.url;
+    let base = (name || '').trim();
+    let ext = 'wav';
+    if (path && typeof path === 'string') {
+        const fname = path.split('/').pop().split('?')[0];
+        ext = fname.split('.').pop() || 'wav';
+        if (!base) base = fname.replace(/\\.[^.]+$/, '');
+    }
+    base = base || 'output';
     const audio_el = document.querySelector(
         'audio[src]:not([src=""])'
     );
-    let base = (name || '').trim();
-    if (!base && audio_el && audio_el.src) {
-        const parts = audio_el.src.split('/').pop().split('?')[0];
-        base = parts.replace(/\\.[^.]+$/, '');
-    }
-    base = base || 'output';
     if (audio_el && audio_el.src) {
-        const ext = audio_el.src.split('.').pop().split('?')[0] || 'wav';
         const a = document.createElement('a');
         a.href = audio_el.src;
         a.download = base + '.' + ext;
