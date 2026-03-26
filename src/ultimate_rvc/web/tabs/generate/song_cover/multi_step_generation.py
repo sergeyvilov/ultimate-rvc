@@ -27,6 +27,7 @@ from ultimate_rvc.typing_extra import EmbedderModel, RVCContentType
 from ultimate_rvc.web.common import (
     exception_harness,
     render_transfer_component,
+    save_audio_with_config,
     setup_transfer_event,
     toggle_visibility,
     toggle_visible_component,
@@ -658,6 +659,13 @@ def _render_step_5(
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        config_output = gr.Code(
+            label="Configuration JSON",
+            language="json",
+            interactive=False,
+            max_lines=30,
+        )
+        components = [config.instance for config in total_config.all]
         mix_reset_btn.click(
             lambda: [
                 tab_config.main_gain.value,
@@ -714,6 +722,17 @@ def _render_step_5(
         ).then(
             partial(update_dropdowns, get_saved_output_audio, 1, [], [0]),
             outputs=total_config.management.audio.output.instance,
+            show_progress="hidden",
+        ).then(
+            save_audio_with_config,
+            inputs=[
+                song_cover_output,
+                tab_config.output_name.instance,
+                total_config.song.multi_step.voice_model.instance,
+                total_config.speech.multi_step.voice_model.instance,
+                *components,
+            ],
+            outputs=[song_cover_output, config_output],
             show_progress="hidden",
         )
         setup_transfer_event(

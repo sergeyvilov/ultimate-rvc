@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Concatenate, ParamSpec, TypeVar
 
 from functools import partial
+from pathlib import Path
 
 import gradio as gr
 
@@ -735,9 +736,8 @@ def export_config_with_model_info(
 
     Returns
     -------
-    tuple[str, str]
-        The path to the exported JSON file and its content as a
-        formatted JSON string.
+    str
+        The configuration as a formatted JSON string.
 
     """
     from ultimate_rvc.common import CONFIG_DIR  # noqa: PLC0415
@@ -776,7 +776,81 @@ def export_config_with_model_info(
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     config_path = CONFIG_DIR / f"{name.strip()}.json"
     json_dump(config_dict, config_path)
-    return str(config_path), json_dumps(config_dict)
+    return json_dumps(config_dict)
+
+
+def save_audio_with_config(
+    audio_path: str | None,
+    output_name: str | None,
+    song_voice_model: str | None,
+    speech_voice_model: str | None,
+    *values: *tuple[Any, ...],
+) -> tuple[str | None, str]:
+    """
+    Save a config JSON alongside an audio file, using the same
+    basename. Returns the JSON content for display.
+
+    Parameters
+    ----------
+    audio_path : str | None
+        The path to the generated audio file.
+    output_name : str | None
+        The desired basename for the config file. If None, derived
+        from the audio file name.
+    song_voice_model : str | None
+        The name of the voice model selected for song generation.
+    speech_voice_model : str | None
+        The name of the voice model selected for speech generation.
+    *values : *tuple[Any, ...]
+        The component values to include in the configuration.
+
+    Returns
+    -------
+    tuple[str | None, str]
+        The audio path (unchanged) and the JSON content string.
+
+    """
+    from ultimate_rvc.core.common import (  # noqa: PLC0415
+        get_file_hash,
+        json_dump,
+        json_dumps,
+    )
+    from ultimate_rvc.core.generate.common import _get_rvc_files  # noqa: PLC0415
+
+    if not audio_path:
+        return None, ""
+
+    audio_file = Path(audio_path)
+    basename = output_name.strip() if output_name else audio_file.stem
+
+    new_config = TotalConfig()
+    for value, component_config in zip(values, new_config.all, strict=True):
+        component_config.value = value
+
+    config_dict = new_config.model_dump()
+
+    model_files = []
+    for model_name in [song_voice_model, speech_voice_model]:
+        if model_name:
+            try:
+                pth_path, index_path = _get_rvc_files(model_name)
+                entry: dict[str, str] = {
+                    "name": model_name,
+                    "pth_path": str(pth_path),
+                    "pth_hash": get_file_hash(pth_path),
+                }
+                if index_path:
+                    entry["index_path"] = str(index_path)
+                    entry["index_hash"] = get_file_hash(index_path)
+                model_files.append(entry)
+            except Exception:  # noqa: BLE001
+                model_files.append({"name": model_name, "error": "not found"})
+
+    config_dict["model_files"] = model_files
+
+    json_path = audio_file.parent / f"{basename}.json"
+    json_dump(config_dict, json_path)
+    return audio_path, json_dumps(config_dict)
 
 
 def load_total_config_values(name: str) -> tuple[Any, ...]:

@@ -79,10 +79,6 @@ def _render_config_files_tab(
                 )
                 export_btn = gr.Button("Export & download", variant="primary")
             with gr.Column():
-                export_file = gr.File(
-                    label="Download",
-                    interactive=False,
-                )
                 export_code = gr.Code(
                     label="Configuration JSON",
                     language="json",
@@ -101,7 +97,7 @@ def _render_config_files_tab(
                 total_config.speech.multi_step.voice_model.instance,
                 *components,
             ],
-            outputs=[export_file, export_code],
+            outputs=export_code,
         )
 
         with gr.Accordion("Load configuration", open=False), gr.Row():

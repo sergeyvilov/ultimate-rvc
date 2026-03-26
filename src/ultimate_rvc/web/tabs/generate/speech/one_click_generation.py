@@ -20,6 +20,7 @@ from ultimate_rvc.typing_extra import EmbedderModel
 from ultimate_rvc.web.common import (
     PROGRESS_BAR,
     exception_harness,
+    save_audio_with_config,
     toggle_intermediate_audio,
     toggle_visibility,
     toggle_visible_component,
@@ -61,6 +62,13 @@ def render(total_config: TotalConfig) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        config_output = gr.Code(
+            label="Configuration JSON",
+            language="json",
+            interactive=False,
+            max_lines=30,
+        )
+        components = [config.instance for config in total_config.all]
         generate_btn.click(
             partial(
                 exception_harness(
@@ -109,6 +117,17 @@ def render(total_config: TotalConfig) -> None:
         ).then(
             partial(update_dropdowns, get_saved_output_audio, 1),
             outputs=total_config.management.audio.output.instance,
+            show_progress="hidden",
+        ).then(
+            save_audio_with_config,
+            inputs=[
+                mixed_speech,
+                tab_config.output_name.instance,
+                total_config.song.multi_step.voice_model.instance,
+                total_config.speech.multi_step.voice_model.instance,
+                *components,
+            ],
+            outputs=[mixed_speech, config_output],
             show_progress="hidden",
         )
         reset_btn.click(
