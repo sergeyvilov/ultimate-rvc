@@ -377,6 +377,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
             interactive=False,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        config_json_state = gr.State("")
 
         mix_speech_reset_btn.click(
             lambda: [
@@ -415,7 +416,7 @@ def _render_step_3(total_config: TotalConfig) -> None:
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
             ],
-            outputs=mixed_speech_track_output,
+            outputs=[mixed_speech_track_output, config_json_state],
             show_progress="hidden",
         )
         setup_transfer_event(
@@ -426,7 +427,11 @@ def _render_step_3(total_config: TotalConfig) -> None:
         )
         download_btn.click(
             fn=None,
-            inputs=[mixed_speech_track_output, tab_config.output_name.instance],
+            inputs=[
+                mixed_speech_track_output,
+                tab_config.output_name.instance,
+                config_json_state,
+            ],
             outputs=None,
             js=DOWNLOAD_AUDIO_JS,
         )

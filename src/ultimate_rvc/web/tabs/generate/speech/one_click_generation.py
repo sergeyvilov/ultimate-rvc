@@ -64,6 +64,7 @@ def render(total_config: TotalConfig) -> None:
             scale=3,
             waveform_options=gr.WaveformOptions(show_recording_waveform=False),
         )
+        config_json_state = gr.State("")
         generate_btn.click(
             partial(
                 exception_harness(
@@ -121,7 +122,7 @@ def render(total_config: TotalConfig) -> None:
                 total_config.song.multi_step.voice_model.instance,
                 total_config.speech.multi_step.voice_model.instance,
             ],
-            outputs=mixed_speech,
+            outputs=[mixed_speech, config_json_state],
             show_progress="hidden",
         )
         reset_btn.click(
@@ -181,7 +182,11 @@ def render(total_config: TotalConfig) -> None:
         )
         download_btn.click(
             fn=None,
-            inputs=[mixed_speech, tab_config.output_name.instance],
+            inputs=[
+                mixed_speech,
+                tab_config.output_name.instance,
+                config_json_state,
+            ],
             outputs=None,
             js=DOWNLOAD_AUDIO_JS,
         )

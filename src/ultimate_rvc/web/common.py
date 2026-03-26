@@ -37,29 +37,31 @@ if TYPE_CHECKING:
 
 PROGRESS_BAR = gr.Progress()
 
-DOWNLOAD_AUDIO_JS = """(audio_path, name) => {
+DOWNLOAD_AUDIO_JS = """(audio_path, name, json_content) => {
+    const base = (name || 'output').trim();
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
     const audio_el = document.querySelector(
         'audio[src]:not([src=""])'
     );
-    if (!audio_el || !audio_el.src) {
-        alert('No audio to download');
-        return;
+    if (audio_el && audio_el.src) {
+        const ext = audio_el.src.split('.').pop().split('?')[0] || 'wav';
+        fetch(audio_el.src)
+            .then(r => r.blob())
+            .then(blob => downloadBlob(blob, base + '.' + ext));
     }
-    const src = audio_el.src;
-    const ext = src.split('.').pop().split('?')[0] || 'wav';
-    const fname = (name || 'output').trim() + '.' + ext;
-    fetch(src)
-        .then(r => r.blob())
-        .then(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fname;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
+    if (json_content) {
+        const blob = new Blob([json_content], {type: 'application/json'});
+        downloadBlob(blob, base + '.json');
+    }
 }"""
 
 T = TypeVar("T")
@@ -809,10 +811,10 @@ def save_audio_with_config(
     output_name: str | None,
     song_voice_model: str | None,
     speech_voice_model: str | None,
-) -> str | None:
+) -> tuple[str | None, str]:
     """
     Save a config JSON alongside an audio file, using the same
-    basename. The JSON is saved server-side only.
+    basename. Returns both the audio path and the JSON content.
 
     Parameters
     ----------
@@ -828,18 +830,19 @@ def save_audio_with_config(
 
     Returns
     -------
-    str | None
-        The audio path (unchanged).
+    tuple[str | None, str]
+        The audio path (unchanged) and the JSON content string.
 
     """
     from ultimate_rvc.core.common import (  # noqa: PLC0415
         get_file_hash,
         json_dump,
+        json_dumps,
     )
     from ultimate_rvc.core.generate.common import _get_rvc_files  # noqa: PLC0415
 
     if not audio_path:
-        return None
+        return None, ""
 
     audio_file = Path(audio_path)
     basename = output_name.strip() if output_name else audio_file.stem
@@ -868,7 +871,7 @@ def save_audio_with_config(
 
     json_path = audio_file.parent / f"{basename}.json"
     json_dump(config_dict, json_path)
-    return audio_path
+    return audio_path, json_dumps(config_dict)
 
 
 def load_total_config_values(name: str) -> tuple[Any, ...]:
