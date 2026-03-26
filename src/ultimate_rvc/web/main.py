@@ -34,7 +34,11 @@ from ultimate_rvc.core.manage.models import (
     get_training_model_names,
     get_voice_model_names,
 )
-from ultimate_rvc.web.common import initialize_dropdowns
+from ultimate_rvc.web.common import (
+    DOWNLOAD_AUDIO_JS,
+    initialize_dropdowns,
+    save_audio_with_config,
+)
 from ultimate_rvc.web.config.main import TotalConfig
 from ultimate_rvc.web.tabs.generate.song_cover.multi_step_generation import (
     render as render_song_cover_multi_step_tab,
@@ -124,17 +128,56 @@ def render_app() -> gr.Blocks:
         # main tab
         with gr.Tab("Generate", elem_id="generate-tab"):
             with gr.Tab("Song covers"):
-                render_song_cover_one_click_tab(total_config, cookiefile)
-                render_song_cover_multi_step_tab(total_config, cookiefile)
+                song_oc_dl = render_song_cover_one_click_tab(
+                    total_config,
+                    cookiefile,
+                )
+                song_ms_dl = render_song_cover_multi_step_tab(
+                    total_config,
+                    cookiefile,
+                )
             with gr.Tab("Speech"):
-                render_speech_one_click_tab(total_config)
-                render_speech_multi_step_tab(total_config)
+                speech_oc_dl = render_speech_one_click_tab(total_config)
+                speech_ms_dl = render_speech_multi_step_tab(total_config)
         with gr.Tab("Models", elem_id="manage-tab"):
             render_models_tab(total_config)
         with gr.Tab("Audio", elem_id="audio-tab"):
             render_audio_tab(total_config)
         with gr.Tab("Settings", elem_id="settings-tab"):
             render_settings_tab(total_config)
+
+        # Wire download events after all tabs are rendered
+        # so that total_config.all can access all component instances
+        components = [config.instance for config in total_config.all]
+        for dl_info in [
+            song_oc_dl,
+            song_ms_dl,
+            speech_oc_dl,
+            speech_ms_dl,
+        ]:
+            dl_info["download_btn"].click(
+                save_audio_with_config,
+                inputs=[
+                    dl_info["audio_path_state"],
+                    dl_info["output_name"],
+                    total_config.song.multi_step.voice_model.instance,
+                    total_config.speech.multi_step.voice_model.instance,
+                    *components,
+                ],
+                outputs=[
+                    dl_info["audio_path_state"],
+                    dl_info["config_json_state"],
+                ],
+            ).then(
+                fn=None,
+                inputs=[
+                    dl_info["audio_path_state"],
+                    dl_info["output_name"],
+                    dl_info["config_json_state"],
+                ],
+                outputs=None,
+                js=DOWNLOAD_AUDIO_JS,
+            )
 
         app.load(
             _init_dropdowns,

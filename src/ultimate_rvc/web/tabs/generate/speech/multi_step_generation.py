@@ -25,10 +25,8 @@ from ultimate_rvc.core.manage.audio import (
 )
 from ultimate_rvc.typing_extra import EmbedderModel, RVCContentType
 from ultimate_rvc.web.common import (
-    DOWNLOAD_AUDIO_JS,
     exception_harness,
     render_transfer_component,
-    save_audio_with_config,
     setup_transfer_event,
     toggle_visibility,
     toggle_visible_component,
@@ -42,7 +40,7 @@ if TYPE_CHECKING:
     from ultimate_rvc.web.config.main import TotalConfig
 
 
-def render(total_config: TotalConfig) -> None:
+def render(total_config: TotalConfig) -> dict:
     """
     Render "Generate speech - multi-step generation" tab.
 
@@ -52,6 +50,11 @@ def render(total_config: TotalConfig) -> None:
         Model containing all component configuration settings for the
         Ultimate RVC web UI.
 
+    Returns
+    -------
+    dict
+        Download-related component references for deferred wiring.
+
     """
     tab_config = total_config.speech.multi_step
     for c in tab_config.input_audio.all:
@@ -59,7 +62,7 @@ def render(total_config: TotalConfig) -> None:
     with gr.Tab("Multi-step"):
         _render_step_1(total_config)
         _render_step_2(total_config)
-        _render_step_3(total_config)
+        return _render_step_3(total_config)
 
 
 def _render_step_1(total_config: TotalConfig) -> None:
@@ -424,25 +427,12 @@ def _render_step_3(total_config: TotalConfig) -> None:
             mixed_speech_track_output,
             tab_config.input_audio.all,
         )
-        download_btn.click(
-            save_audio_with_config,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                total_config.song.multi_step.voice_model.instance,
-                total_config.speech.multi_step.voice_model.instance,
-            ],
-            outputs=[audio_path_state, config_json_state],
-        ).then(
-            fn=None,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                config_json_state,
-            ],
-            outputs=None,
-            js=DOWNLOAD_AUDIO_JS,
-        )
+    return {
+        "download_btn": download_btn,
+        "audio_path_state": audio_path_state,
+        "config_json_state": config_json_state,
+        "output_name": tab_config.output_name.instance,
+    }
 
 
 def _render_speech_transfer(

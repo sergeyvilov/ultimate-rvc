@@ -25,10 +25,8 @@ from ultimate_rvc.core.generate.song_cover import (
 from ultimate_rvc.core.manage.audio import get_saved_output_audio
 from ultimate_rvc.typing_extra import EmbedderModel, RVCContentType
 from ultimate_rvc.web.common import (
-    DOWNLOAD_AUDIO_JS,
     exception_harness,
     render_transfer_component,
-    save_audio_with_config,
     setup_transfer_event,
     toggle_visibility,
     toggle_visible_component,
@@ -44,7 +42,7 @@ if TYPE_CHECKING:
     from ultimate_rvc.web.config.main import MultiStepSongGenerationConfig, TotalConfig
 
 
-def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
+def render(total_config: TotalConfig, cookiefile: str | None = None) -> dict:
     """
     Render "Generate song cover - multi-step generation" tab.
 
@@ -57,6 +55,11 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         The path to a file containing cookies to use when downloading
         audio from Youtube.
 
+    Returns
+    -------
+    dict
+        Download-related component references for deferred wiring.
+
     """
     tab_config = total_config.song.multi_step
     for input_track in tab_config.input_audio.all:
@@ -67,7 +70,7 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
         _render_step_2(tab_config)
         _render_step_3(tab_config)
         _render_step_4(tab_config)
-        _render_step_5(total_config, tab_config)
+        return _render_step_5(total_config, tab_config)
 
 
 def _render_step_0(total_config: TotalConfig, cookiefile: str | None) -> None:
@@ -736,25 +739,12 @@ def _render_step_5(
             song_cover_output,
             tab_config.input_audio.all,
         )
-        download_btn.click(
-            save_audio_with_config,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                total_config.song.multi_step.voice_model.instance,
-                total_config.speech.multi_step.voice_model.instance,
-            ],
-            outputs=[audio_path_state, config_json_state],
-        ).then(
-            fn=None,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                config_json_state,
-            ],
-            outputs=None,
-            js=DOWNLOAD_AUDIO_JS,
-        )
+    return {
+        "download_btn": download_btn,
+        "audio_path_state": audio_path_state,
+        "config_json_state": config_json_state,
+        "output_name": tab_config.output_name.instance,
+    }
 
 
 def _render_song_transfer(

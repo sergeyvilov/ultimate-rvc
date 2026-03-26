@@ -19,10 +19,8 @@ from ultimate_rvc.core.generate.song_cover import (
 from ultimate_rvc.core.manage.audio import get_saved_output_audio
 from ultimate_rvc.typing_extra import EmbedderModel
 from ultimate_rvc.web.common import (
-    DOWNLOAD_AUDIO_JS,
     PROGRESS_BAR,
     exception_harness,
-    save_audio_with_config,
     toggle_intermediate_audio,
     toggle_visibility,
     toggle_visible_component,
@@ -36,7 +34,7 @@ if TYPE_CHECKING:
     from ultimate_rvc.web.config.main import OneClickSongGenerationConfig, TotalConfig
 
 
-def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
+def render(total_config: TotalConfig, cookiefile: str | None = None) -> dict:
     """
     Render "Generate song covers - One-click generation" tab.
 
@@ -48,6 +46,11 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
     cookiefile : str, optional
         The path to a file containing cookies to use when downloading
         audio from Youtube.
+
+    Returns
+    -------
+    dict
+        Download-related component references for deferred wiring.
 
     """
     with gr.Tab("One-click"):
@@ -200,25 +203,12 @@ def render(total_config: TotalConfig, cookiefile: str | None = None) -> None:
             ],
             show_progress="hidden",
         )
-        download_btn.click(
-            save_audio_with_config,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                total_config.song.multi_step.voice_model.instance,
-                total_config.speech.multi_step.voice_model.instance,
-            ],
-            outputs=[audio_path_state, config_json_state],
-        ).then(
-            fn=None,
-            inputs=[
-                audio_path_state,
-                tab_config.output_name.instance,
-                config_json_state,
-            ],
-            outputs=None,
-            js=DOWNLOAD_AUDIO_JS,
-        )
+    return {
+        "download_btn": download_btn,
+        "audio_path_state": audio_path_state,
+        "config_json_state": config_json_state,
+        "output_name": tab_config.output_name.instance,
+    }
 
 
 def _render_input(tab_config: OneClickSongGenerationConfig) -> None:
