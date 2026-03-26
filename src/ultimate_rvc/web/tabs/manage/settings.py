@@ -18,6 +18,7 @@ from ultimate_rvc.web.common import (
     confirm_box_js,
     confirmation_harness,
     exception_harness,
+    export_config_with_model_info,
     load_total_config_values,
     render_msg,
     save_total_config_values,
@@ -66,6 +67,36 @@ def _render_config_files_tab(
                 save_config_btn = gr.Button("Save", variant="primary")
             with gr.Column():
                 save_config_msg = gr.Textbox(label="Output message", interactive=False)
+
+        with gr.Accordion("Export configuration", open=False), gr.Row():
+            with gr.Column():
+                export_config_name = gr.Textbox(
+                    label="Configuration name",
+                    info="The name of the configuration file to export.",
+                    placeholder="Enter a name for the export",
+                    max_lines=1,
+                    value="exported_config",
+                )
+                export_btn = gr.Button("Export & download", variant="primary")
+            with gr.Column():
+                export_file = gr.File(
+                    label="Download",
+                    interactive=False,
+                )
+
+        export_btn.click(
+            exception_harness(
+                export_config_with_model_info,
+                info_msg="Configuration exported!",
+            ),
+            inputs=[
+                export_config_name,
+                total_config.song.multi_step.voice_model.instance,
+                total_config.speech.multi_step.voice_model.instance,
+                *components,
+            ],
+            outputs=export_file,
+        )
 
         with gr.Accordion("Load configuration", open=False), gr.Row():
             with gr.Column():

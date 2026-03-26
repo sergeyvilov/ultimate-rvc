@@ -1,5 +1,4 @@
-"""
-Module defining common utility functions and classes for the
+"""Module defining common utility functions and classes for the
 web application of the Ultimate RVC project.
 """
 
@@ -45,8 +44,7 @@ def exception_harness(  # noqa: UP047
     fn: Callable[P, T],
     info_msg: str | None = None,
 ) -> Callable[P, T]:
-    """
-    Wrap a function in a harness that catches exceptions and re-raises
+    """Wrap a function in a harness that catches exceptions and re-raises
     them as instances of `gradio.Error`.
 
     Parameters
@@ -86,8 +84,7 @@ def exception_harness(  # noqa: UP047
 def confirmation_harness(  # noqa: UP047
     fn: Callable[P, T],
 ) -> Callable[Concatenate[bool, P], T]:
-    """
-    Wrap a function in a harness that requires a confirmation before
+    """Wrap a function in a harness that requires a confirmation before
     executing and catches exceptions, re-raising them as instances of
     `gradio.Error`.
 
@@ -118,8 +115,7 @@ def render_msg(
     display_info: bool = False,
     **kwargs: str,
 ) -> str:
-    """
-    Render a message template with the provided arguments.
+    """Render a message template with the provided arguments.
 
     Parameters
     ----------
@@ -146,8 +142,7 @@ def render_msg(
 
 
 def confirm_box_js(msg: str) -> str:
-    """
-    Generate a JavaScript code snippet which:
+    """Generate a JavaScript code snippet which:
       * defines an anonymous function that takes one named parameter and
       zero or more unnamed parameters
       * renders a confirmation box
@@ -170,8 +165,7 @@ def confirm_box_js(msg: str) -> str:
 
 
 def update_value(x: str | None) -> dict[str, Any]:
-    """
-    Update the value of a component.
+    """Update the value of a component.
 
     Parameters
     ----------
@@ -188,8 +182,7 @@ def update_value(x: str | None) -> dict[str, Any]:
 
 
 def update_values(*xs: str) -> tuple[dict[str, Any], ...]:
-    """
-    Update the values of multiple components.
+    """Update the values of multiple components.
 
     Parameters
     ----------
@@ -211,8 +204,7 @@ def toggle_visibility(
     default: str | float | None = None,
     update_default: bool = False,
 ) -> dict[str, Any]:
-    """
-    Toggle the visibility of a component based on equality of
+    """Toggle the visibility of a component based on equality of
     a value and one of a set of targets.
 
     Parameters
@@ -245,8 +237,7 @@ def toggle_visibilities(
     defaults: Sequence[str | float | None] = [],
     update_default: bool = False,
 ) -> list[dict[str, Any]]:
-    """
-    Toggle the visibility of multiple components based on equality of
+    """Toggle the visibility of multiple components based on equality of
     a value and one of a set of targets.
 
     Parameters
@@ -292,8 +283,7 @@ def toggle_visible_component(
     visible_index: int,
     reset_values: bool = True,
 ) -> dict[str, Any] | tuple[dict[str, Any], ...]:
-    """
-    Reveal a single component from a set of components. All other
+    """Reveal a single component from a set of components. All other
     components are hidden.
 
     Parameters
@@ -346,8 +336,7 @@ def initialize_dropdowns(
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> list[gr.Dropdown]:
-    """
-    Initialize the choices and optionally the value of one or more
+    """Initialize the choices and optionally the value of one or more
     dropdown components.
 
 
@@ -410,8 +399,7 @@ def update_dropdowns(
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> gr.Dropdown | tuple[gr.Dropdown, ...]:
-    """
-    Update the choices and optionally the value of one or more dropdown
+    """Update the choices and optionally the value of one or more dropdown
     components.
 
     Parameters
@@ -469,8 +457,7 @@ def update_dropdowns(
 
 
 def toggle_intermediate_audio(visible: bool, num_components: int) -> list[gr.Accordion]:
-    """
-    Toggle the visibility of intermediate audio accordions.
+    """Toggle the visibility of intermediate audio accordions.
 
     Parameters
     ----------
@@ -497,8 +484,7 @@ def update_output_name(
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> gr.Textbox:
-    """
-    Update a textbox component so that it displays a suitable name for
+    """Update a textbox component so that it displays a suitable name for
     an output audio file.
 
     Parameters
@@ -537,8 +523,7 @@ def update_audio(
     track: str | None,
     disallow_none: bool = True,
 ) -> gr.Audio | tuple[gr.Audio, ...]:
-    """
-    Update the value of a subset of `Audio` components to the given
+    """Update the value of a subset of `Audio` components to the given
     audio track.
 
     Parameters
@@ -577,8 +562,7 @@ def render_transfer_component(
     label_prefix: str,
     option_type: type[U],
 ) -> gr.Dropdown:
-    """
-    Render a dropdown for transferring tracks.
+    """Render a dropdown for transferring tracks.
 
     Parameters
     ----------
@@ -615,9 +599,7 @@ def setup_transfer_event(
     output: gr.Audio,
     input_configs: Sequence[AudioConfig],
 ) -> Dependency:
-    """
-    Set up a transfer track event for a button component.
-
+    """Set up a transfer track event for a button component.
 
     Parameters
     ----------
@@ -654,8 +636,7 @@ def setup_delete_event(
     confirm_msg: str,
     success_msg: str,
 ) -> Dependency:
-    """
-    Set up a delete event for a button component.
+    """Set up a delete event for a button component.
 
     Parameters
     ----------
@@ -693,8 +674,7 @@ def setup_delete_event(
 
 
 def save_total_config_values(name: str, *values: *tuple[Any, ...]) -> None:
-    """
-    Save the provided component values to a total configuration model
+    """Save the provided component values to a total configuration model
     and write it to a JSON file with the provided name.
 
     Parameters
@@ -713,9 +693,69 @@ def save_total_config_values(name: str, *values: *tuple[Any, ...]) -> None:
     save_config(name, new_config)
 
 
-def load_total_config_values(name: str) -> tuple[Any, ...]:
+def export_config_with_model_info(
+    name: str,
+    song_voice_model: str | None,
+    speech_voice_model: str | None,
+    *values: *tuple[Any, ...],
+) -> str:
+    """Export a configuration JSON file that includes all UI component
+    values and voice model file metadata (paths and hashes).
+
+    Parameters
+    ----------
+    name : str
+        The name of the JSON file to export.
+    song_voice_model : str | None
+        The name of the voice model selected for song generation.
+    speech_voice_model : str | None
+        The name of the voice model selected for speech generation.
+    *values : *tuple[Any, ...]
+        The component values to include in the configuration.
+
+    Returns
+    -------
+    str
+        The path to the exported JSON file.
+
     """
-    Load a total configuration model from a JSON file with the provided
+    from ultimate_rvc.common import CONFIG_DIR  # noqa: PLC0415
+    from ultimate_rvc.core.common import get_file_hash, json_dump  # noqa: PLC0415
+    from ultimate_rvc.core.generate.common import _get_rvc_files  # noqa: PLC0415
+
+    new_config = TotalConfig()
+    for value, component_config in zip(values, new_config.all, strict=True):
+        component_config.value = value
+
+    config_dict = new_config.model_dump()
+
+    model_files = []
+    for model_name in [song_voice_model, speech_voice_model]:
+        if model_name:
+            try:
+                pth_path, index_path = _get_rvc_files(model_name)
+                entry: dict[str, str] = {
+                    "name": model_name,
+                    "pth_path": str(pth_path),
+                    "pth_hash": get_file_hash(pth_path),
+                }
+                if index_path:
+                    entry["index_path"] = str(index_path)
+                    entry["index_hash"] = get_file_hash(index_path)
+                model_files.append(entry)
+            except Exception:  # noqa: BLE001
+                model_files.append({"name": model_name, "error": "not found"})
+
+    config_dict["model_files"] = model_files
+
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    config_path = CONFIG_DIR / f"{name.strip()}.json"
+    json_dump(config_dict, config_path)
+    return str(config_path)
+
+
+def load_total_config_values(name: str) -> tuple[Any, ...]:
+    """Load a total configuration model from a JSON file with the provided
     name and return the non-excluded values of its nested component
     configurations.
 
