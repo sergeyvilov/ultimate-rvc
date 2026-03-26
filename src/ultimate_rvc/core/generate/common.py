@@ -31,7 +31,6 @@ from ultimate_rvc.core.exceptions import (
     NotProvidedError,
     UIMessage,
 )
-from ultimate_rvc.core.generate.formant_shift import formant_shift
 from ultimate_rvc.core.generate.typing_extra import (
     AudioExtInternal,
     FileMetaData,
@@ -377,6 +376,8 @@ def convert(
         "20_Input",
         accepted_formats={AudioExt.M4A, AudioExt.AAC},
     )
+
+    from ultimate_rvc.core.generate.formant_shift import formant_shift  # noqa: PLC0415
 
     audio_path = formant_shift(
         audio_path,
